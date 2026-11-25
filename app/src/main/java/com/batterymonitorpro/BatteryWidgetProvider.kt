@@ -6,6 +6,7 @@ import android.appwidget.AppWidgetProvider
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.widget.RemoteViews
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
@@ -30,18 +31,37 @@ class BatteryWidgetProvider : AppWidgetProvider() {
     }
 
     override fun onUpdate(context: Context, manager: AppWidgetManager, ids: IntArray) {
-        val sticky = context.registerReceiver(null, IntentFilterCompat.batteryChanged())
+        refreshFromBatteryIntent(context)
+    }
+
+    override fun onReceive(context: Context, intent: Intent) {
+        super.onReceive(context, intent)
+        when (intent.action) {
+            Intent.ACTION_POWER_CONNECTED,
+            Intent.ACTION_POWER_DISCONNECTED -> refreshFromBatteryIntent(context)
+        }
+    }
+
+    private fun refreshFromBatteryIntent(context: Context) {
+        val sticky = context.registerReceiver(null, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
         val level = sticky?.getIntExtra("level", -1) ?: -1
         val scale = sticky?.getIntExtra("scale", 100) ?: 100
-        val pct = if (level >= 0 && scale > 0) (level * 100 / scale) else -1
+        val percent = if (level >= 0 && scale > 0) level * 100 / scale else -1
         val statusCode = sticky?.getIntExtra("status", -1) ?: -1
-        val state = when (statusCode) {
+        val status = when (statusCode) {
             2 -> "Заряжается"
             5 -> "Заряжена"
             3 -> "Разряжается"
+            4 -> "Не заряжается"
             else -> "Состояние неизвестно"
         }
-        updateAll(context, JSONObject().put("level", pct).put("statusText", state).toString())
+        val tempTenth = sticky?.getIntExtra("temperature", -1) ?: -1
+        val data = JSONObject().apply {
+            put("level", percent)
+            put("statusText", status)
+            put("temperatureC", if (tempTenth >= 0) tempTenth / 10.0 else JSONObject.NULL)
+        }
+        updateAll(context, data.toString())
     }
 
     companion object {
@@ -77,8 +97,4 @@ class BatteryWidgetProvider : AppWidgetProvider() {
             }
         }
     }
-}
-
-private object IntentFilterCompat {
-    fun batteryChanged() = android.content.IntentFilter(Intent.ACTION_BATTERY_CHANGED)
 }
