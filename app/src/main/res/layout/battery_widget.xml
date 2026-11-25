@@ -20,4 +20,19 @@
         android:text="Состояние батареи"
         android:textColor="#B9C5D4"
         android:textSize="12sp" />
+    <TextView
+        android:id="@+id/widget_temperature"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:text="Температура: —°C"
+        android:textColor="#FFFFFF"
+        android:textSize="12sp" />
+    <TextView
+        android:id="@+id/widget_voltage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Напряжение: — V"
+        android:textColor="#FFFFFF"
+        android:textSize="12sp" />
 </LinearLayout>
