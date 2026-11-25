@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <uses-feature android:name="android.software.app_widgets" android:required="false" />
     <application
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher"
         android:allowBackup="true"
         android:label="Battery Monitor PRO"
         android:theme="@android:style/Theme.Material.NoActionBar"
@@ -27,5 +29,6 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/battery_widget_info" />
         </receiver>
+        <receiver android:name=".NarrowBatteryWidgetProvider" android:exported="true"><intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE" /></intent-filter><meta-data android:name="android.appwidget.provider" android:resource="@xml/battery_widget_narrow_info" /></receiver>
     </application>
 </manifest>
